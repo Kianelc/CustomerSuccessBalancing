@@ -1,0 +1,18 @@
+{
+  "name": "rd-challenges",
+  "version": "1.0.0",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "test": "jest",
+    "start": "node index.js"
+  },
+  "jest": {
+    "testMatch": [
+      "**/tests/**/*.test.js"
+    ]
+  },
+  "devDependencies": {
+    "jest": "^29.6.2"
+  }
+}
