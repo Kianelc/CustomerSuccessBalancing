@@ -12,12 +12,10 @@ function customerSuccessBalancing(
   const updatedCustomerSuccess = setCustomersServedForCSs(customerSuccess);
 
   const employeesSorted = sortByAscendingOrder(updatedCustomerSuccess, "score");
-  console.log('employeesSorted ', employeesSorted);
 
   const customersSorted = sortByAscendingOrder(customers, "score");
-  console.log('customersSorted ', customersSorted);
 
-  console.log('customersSorted ', distributeCustomersToCSs(customersSorted, employeesSorted, customerSuccessAway));
+  const assignedCustomerSuccess =  distributeCustomersToCSs(customersSorted, employeesSorted, customerSuccessAway);
 }
 
 // Inicializar uma lista vazia para cada CS, representando os clientes atribuídos a eles
