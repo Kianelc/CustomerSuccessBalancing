@@ -51,11 +51,13 @@ jobs:
         with:
           script: |
             const { execSync } = require('child_process');
-            execSync('git config --global user.email "action@github.com"');
-            execSync('git config --global user.name "GitHub Action"');
+            const userEmail = process.env.GIT_USER_EMAIL;
+            const userName = process.env.GIT_USER_NAME;
+            execSync(`git config --global user.email "${userEmail}"`);
+            execSync(`git config --global user.name "${userName}"`);
 
       # Step 4: Update version and create tag
       - name: Update version and create tag
         run: npm version patch --force --allow-same-version
         env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TOKEN: ${{ process.env.NPM_TOKEN }}
