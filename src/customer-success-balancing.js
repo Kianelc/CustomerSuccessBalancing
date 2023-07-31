@@ -15,7 +15,12 @@ function customerSuccessBalancing(
 
   const customersSorted = sortByAscendingOrder(customers, "score");
 
+
   const assignedCustomerSuccess =  distributeCustomersToCSs(customersSorted, employeesSorted, customerSuccessAway);
+
+  const totalAttendedCustomers = getTotalAttendedCustomers(assignedCustomerSuccess);
+
+  return findCustomerSuccessWithMostCustomers(totalAttendedCustomers);
 }
 
 // Inicializar uma lista vazia para cada CS, representando os clientes atribuídos a eles
@@ -52,5 +57,32 @@ function filterAvailableCustomerSuccess(customerSuccess, customerSuccessAway) {
 function findAvailableCSWithCapacity(availableCustomerSuccess, customerScore) {
   return availableCustomerSuccess.find((cs) => customerScore <= cs.score);
 }
+
+// Calcula o total de clientes atendidos pelos Customer Success (CSs)
+function getTotalAttendedCustomers(customerSuccess) {
+  for (const cs of customerSuccess) {
+    cs.totalattendedCustomers = cs.attendedCustomers.length;
+  }
+
+  return customerSuccess;
+}
+
+// Encontrar o CS que mais atendeu clientes, caso empatar retorna zero
+function findCustomerSuccessWithMostCustomers(customerSuccess) {
+  let mostAttendedCustomers = customerSuccess[0];
+  let hasTie = false;
+
+  for (let index = 1; index < customerSuccess.length; index++) {
+    if(customerSuccess[index].totalattendedCustomers > mostAttendedCustomers.totalattendedCustomers) {
+      mostAttendedCustomers = customerSuccess[index];
+      hasTie = false;
+    } else if(customerSuccess[index].totalattendedCustomers == mostAttendedCustomers.totalattendedCustomers) {
+      hasTie = true;
+    }
+  }
+
+  return hasTie ? 0 : mostAttendedCustomers.id;
+}
+
 
 module.exports = customerSuccessBalancing;
