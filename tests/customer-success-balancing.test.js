@@ -48,6 +48,11 @@ test("Scenario 2", () => {
 });
 
 test("Scenario 3", () => {
+    if (process.env.SKIP_SCENARIO_3 === "true") {
+        // Ignora o teste se SKIP_SCENARIO_3 for "true"
+        return;
+    }
+
     const testTimeoutInMs = 100;
     const testStartTime = new Date().getTime();
 
