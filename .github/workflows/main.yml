@@ -60,4 +60,4 @@ jobs:
       - name: Update version and create tag
         run: npm version patch --force --allow-same-version
         env:
-          NPM_TOKEN: ${{ process.env.NPM_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
