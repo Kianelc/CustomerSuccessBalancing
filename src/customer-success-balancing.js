@@ -1,26 +1,38 @@
 // Main function for balancing customers with available CSs
-function customerSuccessBalancing(
-  customerSuccess,
-  customers,
-  customerSuccessAway
-) {
-  setCustomersServedForCSs(customerSuccess);
-
-  const employeesSorted = sortByAscendingOrder(customerSuccess, "score");
-  const customersSorted = sortByAscendingOrder(customers, "score");
-
-  distributeCustomersToCSs(customersSorted, employeesSorted, customerSuccessAway);
-
-  getTotalAttendedCustomers(employeesSorted);
-
-  return findCustomerSuccessWithMostCustomers(employeesSorted);
-}
-
-// Initialize an empty list for each CS, representing the customers assigned to them
-function setCustomersServedForCSs(customerSuccess) {
+function customerSuccessBalancing(customerSuccess, customers, customerSuccessAway) {
+  // Step 1: Initialize the list of customers attended by each CS
   for (const cs of customerSuccess) {
     cs.attendedCustomers = [];
   }
+
+  // Step 2: Sort CS representatives and customers in ascending order based on the score
+  const employeesSorted = sortByAscendingOrder(customerSuccess, "score");
+  const customersSorted = sortByAscendingOrder(customers, "score");
+
+  // Step 3: Distribute customers among available CS representatives
+  const availableCustomerSuccess = employeesSorted.filter((cs) => !customerSuccessAway.includes(cs.id));
+
+  for (const customer of customersSorted) {
+    const csToAssign = findAvailableCSWithCapacity(availableCustomerSuccess, customer.score);
+    if (csToAssign) {
+      csToAssign.attendedCustomers.push(customer.id);
+    }
+  }
+
+  // Step 4: Find the CS representative who attended the most customers, return 0 in case of a tie
+  let mostAttendedCustomers = employeesSorted[0];
+  let hasTie = false;
+
+  for (let i = 1; i < employeesSorted.length; i++) {
+    if (employeesSorted[i].attendedCustomers.length > mostAttendedCustomers.attendedCustomers.length) {
+      mostAttendedCustomers = employeesSorted[i];
+      hasTie = false;
+    } else if (employeesSorted[i].attendedCustomers.length === mostAttendedCustomers.attendedCustomers.length) {
+      hasTie = true;
+    }
+  }
+
+  return hasTie ? 0 : mostAttendedCustomers.id;
 }
 
 // Sort CSs and customers in ascending order
@@ -28,48 +40,8 @@ function sortByAscendingOrder(data, attribute) {
   return [...data].sort((a, b) => a[attribute] - b[attribute]);
 }
 
-// Distribute customers among available CSs
-function distributeCustomersToCSs(customers, customerSuccess, customerSuccessAway) {
-  const availableCustomerSuccess = filterAvailableCustomerSuccess(customerSuccess, customerSuccessAway);
-
-  for (const customer of customers) {
-    const csToAssign = findAvailableCSWithCapacity(availableCustomerSuccess, customer.score);
-    if (csToAssign) {
-      csToAssign.attendedCustomers.push(customer.id);
-    }
-  }
-}
-
-function filterAvailableCustomerSuccess(customerSuccess, customerSuccessAway) {
-  return customerSuccess.filter((cs) => !customerSuccessAway.includes(cs.id));
-}
-
 function findAvailableCSWithCapacity(availableCustomerSuccess, customerScore) {
   return availableCustomerSuccess.find((cs) => customerScore <= cs.score);
-}
-
-// Calculate the total of customers attended by each Customer Success (CS)
-function getTotalAttendedCustomers(customerSuccess) {
-  for (const cs of customerSuccess) {
-    cs.totalAttendedCustomers = cs.attendedCustomers.length;
-  }
-}
-
-// Find the CS that attended the most customers, return 0 in case of a tie
-function findCustomerSuccessWithMostCustomers(customerSuccess) {
-  let mostAttendedCustomers = customerSuccess[0];
-  let hasTie = false;
-
-  for (let index = 1; index < customerSuccess.length; index++) {
-    if (customerSuccess[index].totalAttendedCustomers > mostAttendedCustomers.totalAttendedCustomers) {
-      mostAttendedCustomers = customerSuccess[index];
-      hasTie = false;
-    } else if (customerSuccess[index].totalAttendedCustomers === mostAttendedCustomers.totalAttendedCustomers) {
-      hasTie = true;
-    }
-  }
-
-  return hasTie ? 0 : mostAttendedCustomers.id;
 }
 
 module.exports = customerSuccessBalancing;
