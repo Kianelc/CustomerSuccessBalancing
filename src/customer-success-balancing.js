@@ -1,42 +1,34 @@
-/**
- * Returns the id of the CustomerSuccess with the most customers
- * @param {array} customerSuccess
- * @param {array} customers
- * @param {array} customerSuccessAway
- */
+// Main function for balancing customers with available CSs
 function customerSuccessBalancing(
   customerSuccess,
   customers,
   customerSuccessAway
 ) {
-  const updatedCustomerSuccess = setCustomersServedForCSs(customerSuccess);
+  setCustomersServedForCSs(customerSuccess);
 
-  const employeesSorted = sortByAscendingOrder(updatedCustomerSuccess, "score");
-
+  const employeesSorted = sortByAscendingOrder(customerSuccess, "score");
   const customersSorted = sortByAscendingOrder(customers, "score");
 
+  distributeCustomersToCSs(customersSorted, employeesSorted, customerSuccessAway);
 
-  const assignedCustomerSuccess =  distributeCustomersToCSs(customersSorted, employeesSorted, customerSuccessAway);
+  getTotalAttendedCustomers(employeesSorted);
 
-  const totalAttendedCustomers = getTotalAttendedCustomers(assignedCustomerSuccess);
-
-  return findCustomerSuccessWithMostCustomers(totalAttendedCustomers);
+  return findCustomerSuccessWithMostCustomers(employeesSorted);
 }
 
-// Inicializar uma lista vazia para cada CS, representando os clientes atribuídos a eles
+// Initialize an empty list for each CS, representing the customers assigned to them
 function setCustomersServedForCSs(customerSuccess) {
-  for (let index = 0; index < customerSuccess.length; index++) {
-    customerSuccess[index].attendedCustomers = [];
+  for (const cs of customerSuccess) {
+    cs.attendedCustomers = [];
   }
-  return customerSuccess;
 }
 
-// Ordenar CSs e customers em ordem crescente
+// Sort CSs and customers in ascending order
 function sortByAscendingOrder(data, attribute) {
   return [...data].sort((a, b) => a[attribute] - b[attribute]);
 }
 
-// Distribuir clientes entre os CSs
+// Distribute customers among available CSs
 function distributeCustomersToCSs(customers, customerSuccess, customerSuccessAway) {
   const availableCustomerSuccess = filterAvailableCustomerSuccess(customerSuccess, customerSuccessAway);
 
@@ -46,8 +38,6 @@ function distributeCustomersToCSs(customers, customerSuccess, customerSuccessAwa
       csToAssign.attendedCustomers.push(customer.id);
     }
   }
-
-  return customerSuccess;
 }
 
 function filterAvailableCustomerSuccess(customerSuccess, customerSuccessAway) {
@@ -58,31 +48,28 @@ function findAvailableCSWithCapacity(availableCustomerSuccess, customerScore) {
   return availableCustomerSuccess.find((cs) => customerScore <= cs.score);
 }
 
-// Calcula o total de clientes atendidos pelos Customer Success (CSs)
+// Calculate the total of customers attended by each Customer Success (CS)
 function getTotalAttendedCustomers(customerSuccess) {
   for (const cs of customerSuccess) {
-    cs.totalattendedCustomers = cs.attendedCustomers.length;
+    cs.totalAttendedCustomers = cs.attendedCustomers.length;
   }
-
-  return customerSuccess;
 }
 
-// Encontrar o CS que mais atendeu clientes, caso empatar retorna zero
+// Find the CS that attended the most customers, return 0 in case of a tie
 function findCustomerSuccessWithMostCustomers(customerSuccess) {
   let mostAttendedCustomers = customerSuccess[0];
   let hasTie = false;
 
   for (let index = 1; index < customerSuccess.length; index++) {
-    if(customerSuccess[index].totalattendedCustomers > mostAttendedCustomers.totalattendedCustomers) {
+    if (customerSuccess[index].totalAttendedCustomers > mostAttendedCustomers.totalAttendedCustomers) {
       mostAttendedCustomers = customerSuccess[index];
       hasTie = false;
-    } else if(customerSuccess[index].totalattendedCustomers == mostAttendedCustomers.totalattendedCustomers) {
+    } else if (customerSuccess[index].totalAttendedCustomers === mostAttendedCustomers.totalAttendedCustomers) {
       hasTie = true;
     }
   }
 
   return hasTie ? 0 : mostAttendedCustomers.id;
 }
-
 
 module.exports = customerSuccessBalancing;
