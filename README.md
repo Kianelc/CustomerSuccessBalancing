@@ -2,6 +2,10 @@
 
 Welcome to CustomerSuccess Balancing! This project is implemented in Javascript and focuses on customer success management.
 
+## Language Version
+
+This project requires Node.js version 14 or higher. Make sure you have Node.js installed before running the project.
+
 ## How to Run the Project
 
 To run the tests for this project, follow the steps below:
